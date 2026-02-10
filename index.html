@@ -90,7 +90,7 @@
             <span class="icon">👩‍🏫</span>
             <span class="label">Вчитель</span>
         </div>
-        <div class="btn" onclick="alert('Мій ID: ' + user.id)">Перевірити мій ID</div>
+        <div class="btn" onclick="checkMyUsername()">Перевірити мій Username</div>
     </div>
 
     <script>
@@ -112,29 +112,33 @@
                 const response = await fetch(SHEET_CSV_URL);
                 const data = await response.text();
 
-                // Розбиваємо CSV на рядки
-                const rows = data.split('\n');
-                const currentUserId = String(user.id).trim(); // ID того, хто відкрив бот
+                const rows = data.split(/\r?\n/);
+                // Отримуємо username користувача (без @)
+                const currentUsername = String(tg.initDataUnsafe?.user?.username || "").trim().toLowerCase();
 
-                console.log("Шукаємо ID:", currentUserId);
+                console.log("Шукаємо користувача:", currentUsername);
+
+                if (!currentUsername) {
+                    console.error("У користувача немає нікнейму в налаштуваннях Telegram!");
+                    return;
+                }
 
                 for (let i = 1; i < rows.length; i++) {
-                    // Використовуємо регулярний вираз, щоб правильно розділити коми, 
-                    // навіть якщо всередині посилань є символи
-                    const cols = rows[i].split(',');
+                    const cols = rows[i].includes(';') ? rows[i].split(';') : rows[i].split(',');
+
                     if (cols.length < 2) continue;
 
-                    const tableId = cols[0].trim().replace(/"/g, ''); // Прибираємо зайві лапки
-                    const tableMiro = cols[1].trim().replace(/"/g, '');
+                    const tableUsername = cols[0].trim().replace(/["'@]/g, '').toLowerCase();
+                    const tableMiro = cols[1].trim().replace(/["']/g, '');
 
-                    if (tableId === currentUserId) {
+                    if (tableUsername === currentUsername) {
                         userMiroLink = tableMiro;
-                        console.log("Знайдено! Посилання:", userMiroLink);
+                        console.log("Знайдено Miro для:", tableUsername);
                         break;
                     }
                 }
             } catch (e) {
-                console.error("Помилка завантаження таблиці", e);
+                console.error("Помилка:", e);
             }
         }
 
@@ -158,15 +162,12 @@
             });
         }
 
-        function checkMyId() {
-            try {
-                if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                    alert('Твій ID: ' + tg.initDataUnsafe.user.id);
-                } else {
-                    alert('Помилка: Telegram не передав дані користувача. Відкрий додаток через бота!');
-                }
-            } catch (e) {
-                alert('Сталася помилка: ' + e.message);
+        function checkMyUsername() {
+            const username = tg.initDataUnsafe?.user?.username;
+            if (username) {
+                alert('Твій Username: ' + username);
+            } else {
+                alert('У тебе не встановлено Username у налаштуваннях Telegram! Додай його в профілі.');
             }
         }
     </script>
