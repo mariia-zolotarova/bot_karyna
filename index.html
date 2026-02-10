@@ -111,18 +111,27 @@
                 const response = await fetch(SHEET_CSV_URL);
                 const data = await response.text();
 
-                // Розбиваємо CSV на рядки та колонки
-                const rows = data.split('\n').slice(1); // Прибираємо шапку
-                rows.forEach(row => {
-                    const cols = row.split(',');
-                    const tableId = cols[0]?.trim();
-                    const tableMiro = cols[1]?.trim();
+                // Розбиваємо CSV на рядки
+                const rows = data.split('\n');
+                const currentUserId = String(user.id).trim(); // ID того, хто відкрив бот
 
-                    // Якщо ID з таблиці збігається з ID користувача в Телеграм
-                    if (tableId == user.id) {
+                console.log("Шукаємо ID:", currentUserId);
+
+                for (let i = 1; i < rows.length; i++) {
+                    // Використовуємо регулярний вираз, щоб правильно розділити коми, 
+                    // навіть якщо всередині посилань є символи
+                    const cols = rows[i].split(',');
+                    if (cols.length < 2) continue;
+
+                    const tableId = cols[0].trim().replace(/"/g, ''); // Прибираємо зайві лапки
+                    const tableMiro = cols[1].trim().replace(/"/g, '');
+
+                    if (tableId === currentUserId) {
                         userMiroLink = tableMiro;
+                        console.log("Знайдено! Посилання:", userMiroLink);
+                        break;
                     }
-                });
+                }
             } catch (e) {
                 console.error("Помилка завантаження таблиці", e);
             }
