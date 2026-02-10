@@ -108,36 +108,34 @@
         // Функція завантаження даних із таблиці
         async function loadStudentData() {
             try {
-                const response = await fetch(SHEET_CSV_URL);
-                const data = await response.text();
+                // Отримуємо номер телефону з URL (адресного рядка)
+                const urlParams = new URLSearchParams(window.location.search);
+                const userPhone = urlParams.get('phone');
 
-                const rows = data.split(/\r?\n/);
-                // Отримуємо username користувача (без @)
-                const currentUsername = String(tg.initDataUnsafe?.user?.username || "").trim().toLowerCase();
-
-                console.log("Шукаємо користувача:", currentUsername);
-
-                if (!currentUsername) {
-                    console.error("У користувача немає нікнейму в налаштуваннях Telegram!");
+                if (!userPhone) {
+                    console.error("Номер телефону не знайдено в URL");
                     return;
                 }
 
+                const response = await fetch(SHEET_CSV_URL);
+                const data = await response.text();
+                const rows = data.split(/\r?\n/);
+
                 for (let i = 1; i < rows.length; i++) {
                     const cols = rows[i].includes(';') ? rows[i].split(';') : rows[i].split(',');
-
                     if (cols.length < 2) continue;
 
-                    const tableUsername = cols[0].trim().replace(/["'@]/g, '').toLowerCase();
+                    // Очищуємо номер у таблиці (прибираємо +, пробіли)
+                    const tablePhone = cols[0].trim().replace(/[+ "']/g, '');
                     const tableMiro = cols[1].trim().replace(/["']/g, '');
 
-                    if (tableUsername === currentUsername) {
+                    if (tablePhone === userPhone) {
                         userMiroLink = tableMiro;
-                        console.log("Знайдено Miro для:", tableUsername);
                         break;
                     }
                 }
             } catch (e) {
-                console.error("Помилка:", e);
+                console.error("Помилка завантаження таблиці", e);
             }
         }
 
