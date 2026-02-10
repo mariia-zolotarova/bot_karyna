@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кабінет Студента</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            /* Telegram WebApp CSS Variables - Адаптується під тему користувача */
+            --tg-theme-bg-color: #fff;
+            --tg-theme-text-color: #000;
+            --tg-theme-hint-color: #888;
+            --tg-theme-link-color: #248bed;
+            --tg-theme-button-color: #248bed;
+            --tg-theme-button-text-color: #fff;
+            --tg-theme-header-bg-color: #efeff3;
+            --tg-theme-secondary-bg-color: #f7f7f8;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--tg-theme-bg-color);
+            color: var(--tg-theme-text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--tg-theme-text-color);
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            /* 2-3 колонки на мобільних */
+            gap: 15px;
+            max-width: 600px;
+            /* Обмеження ширини для десктопу */
+            margin: 0 auto;
+        }
+
+        .grid-item {
+            background-color: var(--tg-theme-secondary-bg-color);
+            border-radius: 12px;
+            padding: 20px 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--tg-theme-text-color);
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: background-color 0.2s, transform 0.1s ease-in-out;
+        }
+
+        .grid-item:hover {
+            background-color: color-mix(in srgb, var(--tg-theme-secondary-bg-color) 90%, var(--tg-theme-hint-color));
+            transform: translateY(-2px);
+        }
+
+        .grid-item:active {
+            transform: translateY(0);
+        }
+
+        .icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+            color: var(--tg-theme-link-color);
+            /* Використовуємо колір посилань для іконок */
+        }
+
+        /* Адаптація під світлу/темну тему */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --tg-theme-bg-color: #1a1a1a;
+                --tg-theme-text-color: #e0e0e0;
+                --tg-theme-hint-color: #aaa;
+                --tg-theme-header-bg-color: #2a2a2a;
+                --tg-theme-secondary-bg-color: #2c2c2c;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h2 class="header">Привіт, <span id="user-name"></span>!</h2>
+    <div class="grid-container">
+        <div class="grid-item" onclick="openLink('https://docs.google.com/drive/folders/YOUR_MATERIALS_FOLDER_ID')">
+            <span class="icon">📚</span>
+            <span>Матеріали</span>
+        </div>
+        <div class="grid-item" onclick="openLink('https://docs.google.com/forms/d/e/YOUR_HOMEWORK_FORM_ID/viewform')">
+            <span class="icon">📝</span>
+            <span>Домашнє завдання</span>
+        </div>
+        <div class="grid-item" onclick="openLink('https://t.me/your_teacher_username')">
+            <span class="icon">✉️</span>
+            <span>Написати вчителю</span>
+        </div>
+        <div class="grid-item" onclick="openLink('https://zoom.us/j/YOUR_LESSON_LINK')">
+            <span class="icon">➡️</span>
+            <span>Посилання на урок</span>
+        </div>
+        <div class="grid-item" onclick="openLink('https://calendar.google.com/calendar/u/0?cid=YOUR_CALENDAR_ID')">
+            <span class="icon">📅</span>
+            <span>Розклад</span>
+        </div>
+        <div class="grid-item" onclick="openLink('https://secure.wayforpay.com/payment/YOUR_PAYMENT_LINK')">
+            <span class="icon">💳</span>
+            <span>Оплата</span>
+        </div>
+        <div class="grid-item" onclick="openLink('https://your-site.com/profile')">
+            <span class="icon">👤</span>
+            <span>Профіль</span>
+        </div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+
+        // Ініціалізація Web App
+        tg.ready();
+        tg.expand(); // Розгортаємо на весь екран
+
+        // Встановлюємо колір фону для Web App відповідно до теми Telegram
+        if (tg.themeParams && tg.themeParams.bg_color) {
+            document.documentElement.style.setProperty('--tg-theme-bg-color', tg.themeParams.bg_color);
+            document.documentElement.style.setProperty('--tg-theme-text-color', tg.themeParams.text_color);
+            document.documentElement.style.setProperty('--tg-theme-hint-color', tg.themeParams.hint_color);
+            document.documentElement.style.setProperty('--tg-theme-link-color', tg.themeParams.link_color);
+            document.documentElement.style.setProperty('--tg-theme-button-color', tg.themeParams.button_color);
+            document.documentElement.style.setProperty('--tg-theme-button-text-color', tg.themeParams.button_text_color);
+            document.documentElement.style.setProperty('--tg-theme-header-bg-color', tg.themeParams.header_bg_color);
+            document.documentElement.style.setProperty('--tg-theme-secondary-bg-color', tg.themeParams.secondary_bg_color);
+        }
+
+        // Відображаємо ім'я користувача
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            document.getElementById('user-name').innerText = tg.initDataUnsafe.user.first_name || 'Користувач';
+        } else {
+            document.getElementById('user-name').innerText = 'Гість';
+        }
+
+        // Функція для відкриття посилань
+        function openLink(url) {
+            // Для зовнішніх посилань краще використовувати tg.openLink
+            // Для внутрішніх переходів в Web App можна просто window.location.href = url;
+            tg.openLink(url);
+        }
+
+        // Додаємо MainButton (кнопка внизу екрану)
+        // tg.MainButton.setText('Перейти до профілю').show().onClick(() => {
+        //     openLink('https://your-site.com/profile');
+        // });
+    </script>
+</body>
+
+</html>
