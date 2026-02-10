@@ -90,7 +90,6 @@
             <span class="icon">👩‍🏫</span>
             <span class="label">Вчитель</span>
         </div>
-        <div class="btn" onclick="checkMyUsername()">Перевірити мій Username</div>
     </div>
 
     <script>
@@ -162,14 +161,6 @@
             });
         }
 
-        function checkMyUsername() {
-            const username = tg.initDataUnsafe?.user?.username;
-            if (username) {
-                alert('Твій Username: ' + username);
-            } else {
-                alert('У тебе не встановлено Username у налаштуваннях Telegram! Додай його в профілі.');
-            }
-        }
     </script>
 </body>
 
