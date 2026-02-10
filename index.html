@@ -157,6 +157,18 @@
                 buttons: [{ type: 'ok' }]
             });
         }
+
+        function checkMyId() {
+            try {
+                if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                    alert('Твій ID: ' + tg.initDataUnsafe.user.id);
+                } else {
+                    alert('Помилка: Telegram не передав дані користувача. Відкрий додаток через бота!');
+                }
+            } catch (e) {
+                alert('Сталася помилка: ' + e.message);
+            }
+        }
     </script>
 </body>
 
