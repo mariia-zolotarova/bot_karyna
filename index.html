@@ -319,14 +319,25 @@
                 let html = "";
 
                 for (let i = 1; i < schedRows.length; i++) {
-                    const cols = schedRows[i].split(',');
-                    if (cols[2] && cols[2].trim().toLowerCase() === 'вільний') {
-                        html += `<div class="btn btn-full" style="margin-bottom:5px; background:#e1f5fe" onclick="bookLesson('${cols[0]}', '${cols[1]}')">
-                                    ${cols[0]} о ${cols[1]}
-                                 </div>`;
+                    // Очищуємо рядок від зайвих символів, які додає Google CSV
+                    const row = schedRows[i].replace(/"/g, '');
+                    const cols = row.split(',');
+
+                    if (cols.length < 3) continue;
+
+                    const date = cols[0].trim();
+                    const time = cols[1].trim();
+                    const status = cols[2].trim().toLowerCase();
+
+                    // Перевіряємо статус (тепер ми точно знаємо, що там "вільний")
+                    if (status === 'вільний') {
+                        html += `<div class="btn btn-full" style="margin-bottom:8px; background:#e3f2fd; border: 1px solid #bbdefb; color: #1976d2;" 
+                 onclick="bookLesson('${date}', '${time}')">
+                    🗓 ${date} о ${time}
+                 </div>`;
                     }
                 }
-                document.getElementById('slots-container').innerHTML = html || "Вільних вікон немає";
+                document.getElementById('slots-container').innerHTML = html || "😴 На найближчий час вільних вікон немає";
 
             } catch (e) {
                 console.error("Помилка:", e);
