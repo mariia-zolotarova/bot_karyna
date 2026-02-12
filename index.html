@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="uk">
 
 <head>
@@ -100,7 +100,6 @@
         const user = tg.initDataUnsafe.user;
         if (user) document.getElementById('welcome').innerText = `Привіт, ${user.first_name}!`;
 
-        // СЮДИ ВСТАВ ПОСИЛАННЯ, ЯКЕ СКОПІЮВАЛА В КРОЦІ 1 (CSV)
         const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRS47C4k4QEso7t0axb1RMG7LwOCOiSpBSeaYFLUTwKryeYRWJPEkeEOMp_wGoS0xEWrgyluQ4exIrm/pub?output=csv';
 
         let userMiroLink = "https://miro.com/app/dashboard/"; // Стандартне посилання
@@ -159,6 +158,204 @@
             });
         }
 
+    </script>
+</body>
+
+</html> -->
+
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--tg-theme-bg-color);
+            color: var(--tg-theme-text-color);
+            padding: 15px;
+            margin: 0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            background: var(--tg-theme-secondary-bg-color);
+            padding: 15px 10px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-full {
+            grid-column: span 2;
+        }
+
+        .icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .label {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 20px;
+            margin-top: 10px;
+        }
+
+        /* Стилі для секції розкладу */
+        .schedule-section {
+            margin-top: 25px;
+            border-top: 1px solid #ccc;
+            padding-top: 15px;
+        }
+
+        .slot {
+            background: #3498db;
+            color: white;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .balance-info {
+            text-align: center;
+            font-size: 14px;
+            color: #2ecc71;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <h2 id="welcome">Привіт!</h2>
+    <div id="balance" class="balance-info">Завантаження даних...</div>
+
+    <div class="grid">
+        <div class="btn" onclick="openMiro()">
+            <span class="icon">🎨</span>
+            <span class="label">Матеріали Miro</span>
+        </div>
+        <div class="btn" onclick="openLesson()">
+            <span class="icon">🎥</span>
+            <span class="label">Урок (Google Meet)</span>
+        </div>
+        <div class="btn btn-full" onclick="contactTeacher()">
+            <span class="icon">👩‍🏫</span>
+            <span class="label">Написати вчителю</span>
+        </div>
+        <div class="btn" onclick="showPayment()">
+            <span class="icon">💳</span>
+            <span class="label">Оплата</span>
+        </div>
+    </div>
+
+    <div class="schedule-section">
+        <h3>📅 Вільні години (натисніть щоб забронювати):</h3>
+        <div id="slots-container">Шукаю вільні вікна...</div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+
+        // --- ВАЖЛИВО: ПОСИЛАННЯ МАЄ ЗАКІНЧУВАТИСЯ НА output=csv ---
+        const SHEET_USERS_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRS47C4k4QEso7t0axb1RMG7LwOCOiSpBSeaYFLUTwKryeYRWJPEkeEOMp_wGoS0xEWrgyluQ4exIrm/pub?output=csv';
+        const SHEET_SCHEDULE_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRS47C4k4QEso7t0axb1RMG7LwOCOiSpBSeaYFLUTwKryeYRWJPEkeEOMp_wGoS0xEWrgyluQ4exIrm/pub?gid=245768947&output=csv';
+        let userMiroLink = "https://miro.com/app/dashboard/";
+        let currentPhone = new URLSearchParams(window.location.search).get('phone');
+
+        async function loadAllData() {
+            if (!currentPhone) {
+                document.getElementById('welcome').innerText = "Помилка: номер не знайдено";
+                return;
+            }
+
+            try {
+                // 1. Завантаження даних користувача (Баланс + Miro)
+                const resUsers = await fetch(SHEET_USERS_URL);
+                const usersCsv = await resUsers.text();
+                const userRows = usersCsv.split(/\r?\n/);
+
+                for (let i = 1; i < userRows.length; i++) {
+                    const cols = userRows[i].split(',');
+                    if (cols[0].trim().replace(/[+ "']/g, '') === currentPhone) {
+                        document.getElementById('welcome').innerText = `Привіт, ${cols[1]}!`;
+                        userMiroLink = cols[2].trim();
+                        document.getElementById('balance').innerText = `Залишилося занять: ${cols[3] || 0}`;
+                        break;
+                    }
+                }
+
+                // 2. Завантаження розкладу
+                const resSched = await fetch(SHEET_SCHEDULE_URL);
+                const schedCsv = await resSched.text();
+                const schedRows = schedCsv.split(/\r?\n/);
+                let html = "";
+
+                for (let i = 1; i < schedRows.length; i++) {
+                    const cols = schedRows[i].split(',');
+                    if (cols[2] && cols[2].trim().toLowerCase() === 'вільний') {
+                        html += `<div class="btn btn-full" style="margin-bottom:5px; background:#e1f5fe" onclick="bookLesson('${cols[0]}', '${cols[1]}')">
+                                    ${cols[0]} о ${cols[1]}
+                                 </div>`;
+                    }
+                }
+                document.getElementById('slots-container').innerHTML = html || "Вільних вікон немає";
+
+            } catch (e) {
+                console.error("Помилка:", e);
+            }
+        }
+
+        function bookLesson(date, time) {
+            if (confirm(`Забронювати урок на ${date} о ${time}?`)) {
+                // Надсилаємо дані боту
+                tg.sendData(JSON.stringify({
+                    action: 'book',
+                    date: date,
+                    time: time
+                }));
+            }
+        }
+
+        function openMiro() { tg.openLink(userMiroLink); }
+        function openLesson() { tg.openLink('https://meet.google.com/cxm-odnr-emi'); }
+        function contactTeacher() { tg.openTelegramLink('https://t.me/kov_karyna'); }
+        function showPayment() {
+            tg.showPopup({
+                title: 'Реквізити',
+                message: 'Карта: 5168 7520 0922 0000',
+                buttons: [{ type: 'ok' }]
+            });
+        }
+
+        loadAllData();
     </script>
 </body>
 
