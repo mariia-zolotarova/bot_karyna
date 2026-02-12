@@ -336,44 +336,35 @@
         async function bookLesson(date, time) {
             if (!confirm(`Забронювати урок на ${date} о ${time}?`)) return;
 
-            const scriptUrl = 'ТВІЙ_URL_З_APPS_SCRIPT';
+            const scriptUrl = 'https://script.google.com/macros/s/AKfycbzf3Jx6KxlGEnvGadbLXwnWI7erHkv2rrsdyE4DDum5qFr968-GI9EHIgeW0F_fQwpV/exec'; // Посилання /exec з Google Scripts
             const container = document.getElementById('slots-container');
-            container.innerHTML = "⏳ Бронюємо... зачекайте";
+            container.innerHTML = "⏳ Бронюємо...";
 
             try {
-                // Відправляємо дані в Google Таблицю
-                await fetch(scriptUrl, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    cache: 'no-cache',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        date: date,
-                        time: time,
-                        phone: currentPhone
-                    })
-                });
+                // 1. Спочатку відправляємо дані в Google Таблицю (метод GET через Image найнадійніший для уникнення крашів)
+                const finalUrl = `${scriptUrl}?date=${encodeURIComponent(date)}&time=${encodeURIComponent(time)}&phone=${encodeURIComponent(currentPhone)}`;
 
-                // Даємо системі 500мс, щоб запит точно пішов
+                // Використовуємо fetch, але не чекаємо довго на відповідь
+                fetch(finalUrl, { mode: 'no-cors' });
+
+                // 2. Невелика пауза, щоб запит пішов у мережу
                 setTimeout(() => {
                     try {
-                        // Відправляємо дані боту (працює тільки через Keyboard Button)
+                        // 3. Надсилаємо дані боту, щоб спрацював handle_webapp_data у bot.py
                         tg.sendData(JSON.stringify({
                             action: 'book',
                             date: date,
                             time: time
                         }));
-                    } catch (e) {
-                        console.log("Бот не прийняв дані, закриваємо так");
+                    } catch (err) {
+                        console.error("Помилка відправки даних боту:", err);
                     }
-
-                    // Якщо sendData не спрацював (наприклад, відкрили через посилання), 
-                    // просто закриваємо додаток
+                    // 4. Закриваємо WebApp
                     tg.close();
                 }, 500);
 
             } catch (e) {
-                alert("Помилка: " + e.message);
+                alert("Помилка мережі: " + e.message);
                 container.innerHTML = "❌ Помилка. Спробуйте ще раз.";
             }
         }
