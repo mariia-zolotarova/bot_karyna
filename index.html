@@ -339,13 +339,13 @@
 
                     // Якщо це вільне вікно
                     if (status === 'вільний') {
-                        freeSlotsHtml += `<div class="btn btn-full" style="margin-bottom:8px; background:#e3f2fd;" onclick="bookLesson('${date}', '${time}')">
+                        freeSlotsHtml += `<div class="btn btn-full" style="margin-bottom:8px; color:black; background:#e3f2fd;" onclick="bookLesson('${date}', '${time}')">
                             🗓 ${date} о ${time}
                          </div>`;
                     }
                     // Якщо це вікно заброньоване ЦИМ студентом
                     else if (studentPhone === currentPhone) {
-                        mySlotsHtml += `<div class="slot" style="background:#2ecc71; color:black; margin-bottom:5px;">
+                        mySlotsHtml += `<div class="slot" style="background:#2ecc71; color:white; margin-bottom:5px;">
                             ✅ ${date} о ${time}
                         </div>`;
                     }
