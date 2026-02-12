@@ -333,14 +333,37 @@
             }
         }
 
-        function bookLesson(date, time) {
+        async function bookLesson(date, time) {
             if (confirm(`Забронювати урок на ${date} о ${time}?`)) {
-                // Надсилаємо дані боту
-                tg.sendData(JSON.stringify({
-                    action: 'book',
-                    date: date,
-                    time: time
-                }));
+                const scriptUrl = 'https://script.google.com/macros/s/AKfycbwGd8ZW5p8KAVmhKu7mpEQnVqtM7CMBUaGTHDCSVefDnCaIoD6rL7EwNUmeupv54Y8S/exec';
+
+                // Показуємо завантаження
+                document.getElementById('slots-container').innerHTML = "Бронюємо...";
+
+                try {
+                    await fetch(scriptUrl, {
+                        method: 'POST',
+                        mode: 'no-cors', // Важливо для Google Scripts
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            date: date,
+                            time: time,
+                            phone: currentPhone
+                        })
+                    });
+
+                    // Повідомляємо боту, щоб він надіслав тобі повідомлення
+                    tg.sendData(JSON.stringify({
+                        action: 'book',
+                        date: date,
+                        time: time
+                    }));
+
+                    alert("Готово! Година заброньована.");
+                    tg.close();
+                } catch (e) {
+                    alert("Помилка бронювання: " + e);
+                }
             }
         }
 
