@@ -334,36 +334,47 @@
         }
 
         async function bookLesson(date, time) {
-            if (confirm(`Забронювати урок на ${date} о ${time}?`)) {
-                const scriptUrl = 'https://script.google.com/macros/s/AKfycbwGd8ZW5p8KAVmhKu7mpEQnVqtM7CMBUaGTHDCSVefDnCaIoD6rL7EwNUmeupv54Y8S/exec';
+            if (!confirm(`Забронювати урок на ${date} о ${time}?`)) return;
 
-                // Показуємо завантаження
-                document.getElementById('slots-container').innerHTML = "Бронюємо...";
+            const scriptUrl = 'ТВІЙ_URL_З_APPS_SCRIPT';
+            const container = document.getElementById('slots-container');
+            container.innerHTML = "⏳ Бронюємо... зачекайте";
 
-                try {
-                    await fetch(scriptUrl, {
-                        method: 'POST',
-                        mode: 'no-cors', // Важливо для Google Scripts
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            date: date,
-                            time: time,
-                            phone: currentPhone
-                        })
-                    });
-
-                    // Повідомляємо боту, щоб він надіслав тобі повідомлення
-                    tg.sendData(JSON.stringify({
-                        action: 'book',
+            try {
+                // Відправляємо дані в Google Таблицю
+                await fetch(scriptUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    cache: 'no-cache',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
                         date: date,
-                        time: time
-                    }));
+                        time: time,
+                        phone: currentPhone
+                    })
+                });
 
-                    alert("Готово! Година заброньована.");
+                // Даємо системі 500мс, щоб запит точно пішов
+                setTimeout(() => {
+                    try {
+                        // Відправляємо дані боту (працює тільки через Keyboard Button)
+                        tg.sendData(JSON.stringify({
+                            action: 'book',
+                            date: date,
+                            time: time
+                        }));
+                    } catch (e) {
+                        console.log("Бот не прийняв дані, закриваємо так");
+                    }
+
+                    // Якщо sendData не спрацював (наприклад, відкрили через посилання), 
+                    // просто закриваємо додаток
                     tg.close();
-                } catch (e) {
-                    alert("Помилка бронювання: " + e);
-                }
+                }, 500);
+
+            } catch (e) {
+                alert("Помилка: " + e.message);
+                container.innerHTML = "❌ Помилка. Спробуйте ще раз.";
             }
         }
 
