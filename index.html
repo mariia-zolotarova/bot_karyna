@@ -266,7 +266,7 @@
         </div>
         <div class="btn" onclick="contactTeacher()">
             <span class="icon">👩‍🏫</span>
-            <span class="label">Написати вчителю</span>
+            <span class="label">Написати мені</span>
         </div>
         <div class="btn" onclick="showPayment()">
             <span class="icon">💳</span>
@@ -281,7 +281,7 @@
     </div>
 
     <div class="schedule-section">
-        <h3>📅 Вільні години (натисніть щоб забронювати):</h3>
+        <h3>📅 Вільні години (натисніть, щоб забронювати):</h3>
         <div id="slots-container">Шукаю вільні вікна...</div>
     </div>
 
@@ -313,7 +313,7 @@
                     if (cols[0].trim().replace(/[+ "']/g, '') === currentPhone) {
                         document.getElementById('welcome').innerText = `Привіт, ${cols[1]}!`;
                         userMiroLink = cols[2].trim();
-                        document.getElementById('balance').innerText = `Залишилося занять: ${cols[3] || 0}`;
+                        document.getElementById('balance').innerText = `Оплачених занять: ${cols[3] || 0}`;
                         break;
                     }
                 }
