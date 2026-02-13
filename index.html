@@ -272,11 +272,10 @@
             <span class="icon">💳</span>
             <span class="label">Оплата</span>
         </div>
-    </div>
-
-    <div class="btn btn-full" onclick="showRules()">
-        <span class="icon">💌</span>
-        <span class="label">Правила співпраці</span>
+        <div class="btn btn-full" onclick="showRules()">
+            <span class="icon">💌</span>
+            <span class="label">Правила співпраці</span>
+        </div>
     </div>
 
     <div class="schedule-section"
@@ -414,7 +413,7 @@
         function showRules() {
             tg.showPopup({
                 title: 'Правила співпраці 🤝',
-                message: `Хочу подякувати Вам за довіру і плідну співпрацю🫶 \n\n📆 Скасування/перенесення уроків:\n\n1) Заняття оплачуються наперед.\n2) Попередження про скасування — за 24 години. Пізніше — урок оплачується.\n3) Форс-мажори (світло, тривоги, хвороба) — переносимо без втрат (до 2 разів на місяць).\n4) При запізненні урок закінчується вчасно.\n\nПравило 24 годин працює і для вчителя! Якщо я скасую пізніше — наступний урок безкоштовний.`,
+                message: `Хочу подякувати Вам за довіру і плідну співпрацю🫶`,
                 buttons: [{ type: 'ok', text: 'Зрозуміло' }]
             });
         }
