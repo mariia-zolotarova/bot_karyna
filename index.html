@@ -294,22 +294,6 @@
         <div id="slots-container"></div>
     </div>
 
-    <div id="rules-modal">
-        <div style="white-space: pre-wrap; font-size: 14px; margin-bottom: 20px;">
-            <b>Хочу подякувати Вам за довіру і плідну співпрацю🫶</b>
-
-            📆 <b>Скасування/ перенесення уроків:</b>
-
-            1) Заняття оплачуються наперед (від 2-х).
-            2) Попередження про скасування за 24 години. Пізніше — урок оплачується.
-            3) Форс-мажори (світло, тривоги, хвороба) — переносимо (до 2 разів на місяць).
-            4) При запізненні урок закінчується вчасно.
-
-            <i>Правило про скасування працює і для вчителя!</i>
-        </div>
-        <button class="btn btn-full" onclick="closeRules()" style="background:#2ecc71; color:white;">Зрозуміло</button>
-    </div>
-
     <script>
         const tg = window.Telegram.WebApp;
         tg.ready();
@@ -420,8 +404,7 @@
             }
         }
 
-        function showRules() { document.getElementById('rules-modal').style.display = 'block'; }
-        function closeRules() { document.getElementById('rules-modal').style.display = 'none'; }
+
         function openMiro() { tg.openLink(userMiroLink); }
         function openLesson() { tg.openLink('https://meet.google.com/cxm-odnr-emi'); }
         function contactTeacher() { tg.openTelegramLink('https://t.me/kov_karyna'); }
@@ -433,13 +416,11 @@
             });
         }
 
-        // function showRules() {
-        //     tg.showPopup({
-        //         title: 'Правила співпраці 🤝',
-        //         message: `Хочу подякувати Вам за довіру і плідну співпрацю🫶`,
-        //         buttons: [{ type: 'ok', text: 'Зрозуміло' }]
-        //     });
-        // }
+        function sendRules() {
+            tg.sendData(JSON.stringify({
+                action: 'rules'
+            }));
+        }
 
         loadAllData();
 
