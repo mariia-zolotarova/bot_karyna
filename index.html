@@ -289,10 +289,6 @@
         <div id="slots-container">Шукаю вільні вікна...</div>
     </div>
 
-    <div class="schedule-section">
-        <h3>📅 Вільні години:</h3>
-        <div id="slots-container"></div>
-    </div>
 
     <script>
         const tg = window.Telegram.WebApp;
@@ -416,10 +412,16 @@
             });
         }
 
-        function sendRules() {
-            tg.sendData(JSON.stringify({
-                action: 'rules'
-            }));
+        function showRules() {
+            tg.showPopup({
+                title: 'Правила співпраці 🤝',
+                message: '1. Оплата: Наперед (від 2-х уроків).\n\n' +
+                    '2. Скасування: За 24 год до уроку. Якщо пізніше — заняття оплачується.\n\n' +
+                    '3. Форс-мажори: (світло, тривога, хвороба) — переносимо та відпрацьовуємо протягом 2 тижнів (до 2 разів на місяць).\n\n' +
+                    '4. Запізнення: Урок закінчується у зазначений час.\n\n' +
+                    '💡 Якщо вчитель скасує урок менш ніж за 24 год — наступний урок безкоштовний.',
+                buttons: [{ type: 'ok', text: 'Зрозуміло' }]
+            });
         }
 
         loadAllData();
