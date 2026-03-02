@@ -405,9 +405,16 @@
         function openLesson() { tg.openLink('https://meet.google.com/cxm-odnr-emi'); }
         function contactTeacher() { tg.openTelegramLink('https://t.me/kov_karyna'); }
         function showPayment() {
+            const paymentDetails =
+                "📋 Отримувач:\nФОП Ковальчук Карина Олександрівна\n\n" +
+                "🏦 IBAN:\nUA233220010000026003370070096\n\n" +
+                "🔢 ІПН/ЄДРПОУ: 3806606267\n" +
+                "🏢 МФО: 322001\n" +
+                "🏛️ ЄДРПОУ Банку: 21133352";
+
             tg.showPopup({
                 title: 'Реквізити',
-                message: 'Карта: 5168752009220214',
+                message: paymentDetails,
                 buttons: [{ type: 'ok' }]
             });
         }
