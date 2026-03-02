@@ -83,47 +83,104 @@
             margin-bottom: 10px;
             font-weight: bold;
         }
+
+        .back-btn {
+            display: none;
+            background: var(--tg-theme-secondary-bg-color);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .rules-card {
+            background: rgba(46, 204, 113, 0.1);
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
     </style>
 </head>
 
 <body>
-    <h2 id="welcome">Привіт!</h2>
-    <div id="balance" class="balance-info">Завантаження даних...</div>
+    <button id="backBtn" class="back-btn">⬅ Назад</button>
+    <div id="main-content">
+        <h2 id="welcome">Привіт!</h2>
+        <div id="balance" class="balance-info">Завантаження даних...</div>
+        <!-- ОСНОВНИЙ ЕКРАН -->
+        <div class="grid">
+            <div class="btn" onclick="openMiro()">
+                <span class="icon">🎨</span>
+                <span class="label">Матеріали Miro</span>
+            </div>
+            <div class="btn" onclick="openLesson()">
+                <span class="icon">🎥</span>
+                <span class="label">Урок (Google Meet)</span>
+            </div>
+            <div class="btn" onclick="contactTeacher()">
+                <span class="icon">👩‍🏫</span>
+                <span class="label">Написати мені</span>
+            </div>
+            <div class="btn" onclick="showPayment()">
+                <span class="icon">💳</span>
+                <span class="label">Оплата</span>
+            </div>
+            <div class="btn btn-full" onclick="showRules()">
+                <span class="icon">💌</span>
+                <span class="label">Правила співпраці</span>
+            </div>
+        </div>
 
-    <div class="grid">
-        <div class="btn" onclick="openMiro()">
-            <span class="icon">🎨</span>
-            <span class="label">Матеріали Miro</span>
+        <div class="schedule-section"
+            style="background: rgba(46, 204, 113, 0.1); border-radius: 12px; padding: 10px; margin-bottom: 20px;">
+            <h3 style="margin-top:0; color: #27ae60;">📌 Мій розклад:</h3>
+            <div id="my-schedule-container">Завантаження розкладу...</div>
         </div>
-        <div class="btn" onclick="openLesson()">
-            <span class="icon">🎥</span>
-            <span class="label">Урок (Google Meet)</span>
+
+        <div class="schedule-section">
+            <h3>📅 Вільні години (натисніть, щоб забронювати):</h3>
+            <div id="slots-container">Шукаю вільні вікна...</div>
         </div>
-        <div class="btn" onclick="contactTeacher()">
-            <span class="icon">👩‍🏫</span>
-            <span class="label">Написати мені</span>
-        </div>
-        <div class="btn" onclick="showPayment()">
-            <span class="icon">💳</span>
-            <span class="label">Оплата</span>
-        </div>
-        <!-- <div class="btn btn-full" onclick="showRules()">
-            <span class="icon">💌</span>
-            <span class="label">Правила співпраці</span>
-        </div> -->
+
     </div>
+    <!-- ЕКРАН ПРАВИЛ -->
+    <div id="rules-content" style="display:none;">
 
-    <div class="schedule-section"
-        style="background: rgba(46, 204, 113, 0.1); border-radius: 12px; padding: 10px; margin-bottom: 20px;">
-        <h3 style="margin-top:0; color: #27ae60;">📌 Мій розклад:</h3>
-        <div id="my-schedule-container">Завантаження розкладу...</div>
+        <h3>🤝 Правила співпраці</h3>
+
+        <p>Хочу подякувати Вам за довіру і плідну співпрацю 🫶</p>
+
+        <div class="rules-card">
+            <b>📌 Оплата</b><br>
+            Заняття оплачуються наперед (від 2-х або за місяць).
+        </div>
+
+        <div class="rules-card">
+            <b>📆 Скасування</b><br>
+            Буду дуже вдячна за попередження за 24 години до заняття.
+            Якщо скасування пізніше — урок вважається проведеним.
+        </div>
+
+        <div class="rules-card">
+            <b>⚡ Форс-мажор</b><br>
+            Тривога, світло, хвороба — переносимо та відпрацьовуємо протягом 2 тижнів
+            (до 2 разів на місяць).
+        </div>
+
+        <div class="rules-card">
+            <b>⏰ Запізнення</b><br>
+            Урок завершується у зазначений час.
+        </div>
+
+        <div class="rules-card">
+            <b>🤝 Справедливість</b><br>
+            Якщо я скасовую менш ніж за 24 години — наступне заняття безкоштовне.
+        </div>
+
+        <p>📈 Про підвищення цін попереджаю мінімум за місяць.</p>
+
     </div>
-
-    <div class="schedule-section">
-        <h3>📅 Вільні години (натисніть, щоб забронювати):</h3>
-        <div id="slots-container">Шукаю вільні вікна...</div>
-    </div>
-
 
     <script>
         const tg = window.Telegram.WebApp;
@@ -235,6 +292,18 @@
             }
         }
 
+        function showRules() {
+            document.getElementById("main-content").style.display = "none";
+            document.getElementById("rules-content").style.display = "block";
+            document.getElementById("backBtn").style.display = "block";
+            window.scrollTo(0, 0);
+        }
+
+        document.getElementById("backBtn").onclick = function () {
+            document.getElementById("main-content").style.display = "block";
+            document.getElementById("rules-content").style.display = "none";
+            this.style.display = "none";
+        };
 
         function openMiro() { tg.openLink(userMiroLink); }
         function openLesson() { tg.openLink('https://meet.google.com/cxm-odnr-emi'); }
